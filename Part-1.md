@@ -27,3 +27,33 @@ app.listen(port,()=>{
   console.log("Server is runing",{port});
 })
 ```
+
+### Server 
+```js
+//
+const coffeeData=["mum","rakib","rifat"]
+fetch(`https://github.com/raihan51674`,{
+method :"POST",
+headers : {
+"Content-Type":"application/json",
+},
+body:JSON.stringify(coffeeData)
+})
+.then(res=>res.json())
+.then(data=>console.log(data))
+
+
+//server use
+app.use(express,json())
+app.post
+```
+
+
+
+
+
+
+
+
+
+
