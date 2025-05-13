@@ -1,4 +1,87 @@
+### Frontend to post data
+```js
+//Frontend
 
+const Users = () => {
+
+  const handleAddUser=e=>{
+    e.preventDefault()
+    const name =e.target.name.value;
+    const email=e.target.email.value;
+    const newUser={name, email}
+    console.log(newUser);
+    //data patha in databes
+    fetch("http://localhost:3000/users",{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json"
+      },
+      body:JSON.stringify(newUser)
+    })
+    .then(res=>res.json()).then(data=>{
+    console.log("Data patah complated",data);
+    if(data.insertedId){
+      e.target.reset()
+    }
+    })
+  }
+  return (
+    <div>
+        <form onSubmit={handleAddUser}>
+          <input type="text" name='name' placeholder='Enter Name'/>
+          <br />
+          <input type="email" name='email' placeholder='Enter Email' />
+          <br />
+          <input type="submit" value="Add User" />
+        </form>
+      </div>
+  );
+};
+
+//Server
+const express = require('express');
+const cors = require('cors');
+const { MongoClient, ServerApiVersion } = require('mongodb');
+const app = express();
+const port = process.env.PORT || 3000;
+// Middleware
+app.use(cors());
+app.use(express.json());
+app.get("/", (req, res) => {
+  res.send("Hello server is on");
+});
+// MongoDB connection
+const uri = "mongodb+srv://mdraihan51674:8qxdd1PHK3oxJttE@cluster0.x0iekxk.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+const client = new MongoClient(uri, {
+  serverApi: {
+    version: ServerApiVersion.v1,
+    strict: true,
+    deprecationErrors: true,
+  }
+});
+async function run() {
+  try {
+    await client.connect();
+    console.log("✅ MongoDB connected");
+    const userCollection = client.db("UserDB").collection("users");
+    // POST route
+    app.post("/users", async (req, res) => {
+      console.log("📥 Received:", req.body);
+      const newUser = req.body;
+      const result = await userCollection.insertOne(newUser);
+      res.send(result);
+    });
+  } catch (err) {
+    console.error("❌ MongoDB connection failed:", err);
+  }
+}
+run().catch(console.dir);
+// Server listen
+app.listen(port, () => {
+  console.log(`🚀 Server is running on port ${port}`);
+});
+
+```
 
 
 
