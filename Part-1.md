@@ -82,6 +82,22 @@ app.listen(port, () => {
 });
 
 ```
+### Show data / Get all Data
+```js
+  const userData =use(FetchPromise)
+  console.log(userData);
+  const [user, setUser]=useState(userData)
+    fetch("http://localhost:3000/users",{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json"
+      },
+      body:JSON.stringify(newUser)
+    })
+    .then(res=>res.json()).then(data=>{
+      const newUserData=[...user,newUser]
+      setUser(newUserData)
+```
 
 
 
