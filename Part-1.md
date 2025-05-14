@@ -86,6 +86,7 @@ app.listen(port, () => {
 ```js
   const userData =use(FetchPromise)
   console.log(userData);
+//show data
   const [user, setUser]=useState(userData)
     fetch("http://localhost:3000/users",{
       method:"POST",
@@ -97,6 +98,16 @@ app.listen(port, () => {
     .then(res=>res.json()).then(data=>{
       const newUserData=[...user,newUser]
       setUser(newUserData)
+
+ //data show
+  {
+            user?.map((data)=>{
+              return <div key={data._id}>
+                <h2 >{data.name}</h2>
+                <h2 >{data.email}</h2>
+              </div>
+            })
+          }
 ```
 
 
