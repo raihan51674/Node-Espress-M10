@@ -11,6 +11,51 @@ setdata(remaining)
 }
 
 ```
+```js
+const userData=use(FetchPromise)
+const [users, setUser]=useState(userData)
+//...then(data=>
+if(data.insertedId){
+     NewUser._id = data.insertedId
+      const newUse=[...users, NewUser]
+      setUser(newUse)
+      e.target.reset()
+      }
+
+```
+## SweetAlert :
+```js
+//1. npm install sweetalert2
+//2.confrim permision
+Swal.fire({
+  title: "Are you sure?",
+  text: "You won't be able to revert this!",
+  icon: "warning",
+  showCancelButton: true,
+  confirmButtonColor: "#3085d6",
+  cancelButtonColor: "#d33",
+  confirmButtonText: "Yes, delete it!"
+}).then((result) => {
+  if (result.isConfirmed) {
+    Swal.fire({
+      title: "Deleted!",
+      text: "Your file has been deleted.",
+      icon: "success"
+    });
+  }
+});
+
+//3. suscefull show
+
+Swal.fire({
+  position: "top-end",
+  icon: "success",
+  title: "Your work has been saved",
+  showConfirmButton: false,
+  timer: 1500
+});
+
+```
 
 ### Server :
 ```js
