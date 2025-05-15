@@ -1,3 +1,17 @@
+## State manage :
+```js
+const initialdata = useLoaderData()
+const [data, setdata]=useState(initialdata)
+//map korbo {data.map}
+//props kore pathai dibo another component data={data} setdata={setdata}
+//....then(data=> ar niche
+if(data.deletedCount){
+const remaining=data.filter(item => item._id !== _id)
+setdata(remaining)
+}
+
+```
+
 ### Server :
 ```js
 const express = require('express');
