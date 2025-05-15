@@ -1,47 +1,8 @@
-### Frontend to post data
+### Server :
 ```js
-//Frontend
-
-const Users = () => {
-
-  const handleAddUser=e=>{
-    e.preventDefault()
-    const name =e.target.name.value;
-    const email=e.target.email.value;
-    const newUser={name, email}
-    console.log(newUser);
-    //data patha in databes
-    fetch("http://localhost:3000/users",{
-      method:"POST",
-      headers:{
-        "Content-Type":"application/json"
-      },
-      body:JSON.stringify(newUser)
-    })
-    .then(res=>res.json()).then(data=>{
-    console.log("Data patah complated",data);
-    if(data.insertedId){
-      e.target.reset()
-    }
-    })
-  }
-  return (
-    <div>
-        <form onSubmit={handleAddUser}>
-          <input type="text" name='name' placeholder='Enter Name'/>
-          <br />
-          <input type="email" name='email' placeholder='Enter Email' />
-          <br />
-          <input type="submit" value="Add User" />
-        </form>
-      </div>
-  );
-};
-
-//Server
 const express = require('express');
 const cors = require('cors');
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId} = require('mongodb');
 const app = express();
 const port = process.env.PORT || 3000;
 // Middleware
@@ -71,6 +32,42 @@ async function run() {
       const result = await userCollection.insertOne(newUser);
       res.send(result);
     });
+    //Get route
+    app.get("/users",async(req, res)=>{
+      const cursor =userCollection.find()
+      const users=await cursor.toArray()
+      res.send(users)
+    })
+    //Delete route
+    app.delete("/users/:id", async(req, res)=>{
+      const id =req.params.id
+      console.log(id);
+      const query = {_id : new ObjectId(id)}
+      const result= await userCollection.deleteOne(query)
+      res.send(result)
+    })
+    //single data get
+    app.get("/users/:id", async(req, res)=>{
+      const id =req.params.id 
+      const query ={_id : new ObjectId(id)}
+      const result =await userCollection.findOne(query)
+      res.send(result)
+    })
+    //update user
+    app.put("/users/:id",async(req, res)=>{
+      const id =req.params.id;
+      const user =req.body;
+      const filter ={_id : new ObjectId(id)}
+      const UpdateDoc={
+        $set :{
+          name :user.name,
+          email :user.email
+        }
+      }
+    const options={upsert : true}
+    const result =await userCollection.updateOne(filter, UpdateDoc, options)
+    res.send(result)
+    })
   } catch (err) {
     console.error("❌ MongoDB connection failed:", err);
   }
@@ -80,123 +77,173 @@ run().catch(console.dir);
 app.listen(port, () => {
   console.log(`🚀 Server is running on port ${port}`);
 });
-
 ```
-### Show data / Get all Data
-```js
-  const userData =use(FetchPromise)
-  console.log(userData);
-//show data
-  const [user, setUser]=useState(userData)
-    fetch("http://localhost:3000/users",{
-      method:"POST",
-      headers:{
-        "Content-Type":"application/json"
-      },
-      body:JSON.stringify(newUser)
-    })
-    .then(res=>res.json()).then(data=>{
-      const newUserData=[...user,newUser]
-      setUser(newUserData)
 
- //data show
+### Frontend :
+```js
+//main setup :
+const router = createBrowserRouter([
   {
-            user?.map((data)=>{
-              return <div key={data._id}>
-                <h2 >{data.name}</h2>
-                <h2 >{data.email}</h2>
-              </div>
-            })
-          }
-```
+    path: "/",
+    Component:Root,
+    children:[
+      {index:true, path:"/", Component:Home},
+      {path:"/users/:id",
+      loader: ({params})=>fetch(`http://localhost:3000/users/${params.id}`),
+      Component:UsersDetails
+    },
+    {path:"/update/:id",
+    loader:({params})=>fetch(`http://localhost:3000/users/${params.id}`),
+    Component :UserUpdate
+    },
+    ]
+  },
+]);
 
 
 
-### Server + frontend (get and post and show)
-```js
-//Express setup
-//1.npm init -y 2.npm i express 3.npm i -g nodemon 4.npm i cors
-const express = require("express");
-const cors = require("cors");
-const app =express()
-app.use(cors())
-app.use(express.json())
- const port =3000
- app.get("/",(req,res)=>{
-  res.send("Hello world")
- })
- const data=[
-  {id:1, name:"sabina",email:"savina@gmail.com"},
-  {id:2, name:"kabina",email:"kavina@gmail.com"},
-  {id:3, name:"jorbina",email:"jorvina@gmail.com"},
- ]
- app.get("/user",(req,res)=>{
-  res.send(data)
- })
- app.post("/user",(req,res)=>{
-  console.log("post methoad");
-  console.log(req.body);
-  const newUser=req.body
-  newUser.id = data.length + 1
-  res.send(newUser)
-  //data push
-  data.push(newUser)
- })
- app.listen(port,()=>{
-  console.log("server is run",{port});
-  
- })
-
-
-//Frontend
-import { use, useState } from "react";
-
-const User = ({fetchPromise}) => {
-  const Fetchdata=use(fetchPromise)
-  const [users, setUser]=useState(Fetchdata)
-
-  const handleData=e=>{
+//Create users
+const CreateUser = ({FetchPromise}) => {
+   const userData=use(FetchPromise)
+    const [users, setUser]=useState(userData)
+    console.log(users);
+  const handleSubmit=e=>{
     e.preventDefault()
     const name=e.target.name.value;
     const email=e.target.email.value;
-    const user={name,email}
-    console.log(user);
-    //user create
-    fetch("http://localhost:3000/user",{
-      method :"POST",
-      headers:{
-        "Content-Type":"application/json"
-      },
-      body:JSON.stringify(user)
+    const NewUser={name, email}
+    console.log(NewUser);
 
-    }).then(res=>res.json())
-    .then(data=>{
-    const newUser=[...users,data]
-    setUser(newUser)
-    // e.target.reset()
-  })
+    //create databse create
+    fetch("http://localhost:3000/users",{
+      method:"POST",
+      headers:{
+        "Content-Type" : "application/json"
+      },
+      body:JSON.stringify(NewUser)
+    }).then(res=>res.json()).then(data=>{
+     
+      // console.log(data);
+      if(data.insertedId){
+      NewUser._id = data.insertedId
+      const newUse=[...users, NewUser]
+      setUser(newUse)
+      e.target.reset()
+      }
+    })
   }
   return (
     <div>
-    <div>
-      <form onSubmit={handleData} className="flex flex-col gap-3 border-2">
-        <input type="text" name="name" placeholder="enter name"/>
-        <input type="email" name="email"  placeholder="enter email"/>
-        <input type="submit" value="Submit" />
+      <h2>Create Users</h2>
+      <form onSubmit={handleSubmit}>
+        <input type="text" name='name' placeholder='Enter your name' />
+        <input type="email" name='email' placeholder='Enter your email' />
+        <div>
+          <input type="submit" value="Add Users" />
+        </div>
       </form>
+      <div>
+        <UsersAllDataShow users={users}></UsersAllDataShow>
+      </div>
+      
     </div>
+  );
+};
+
+//Show data delete data
+
+const UsersAllDataShow = ({users}) => {
+  
+  const [user, setUser]=useState(users)
+  const handleDelate=(id)=>{
+    console.log(id);
+    fetch(`http://localhost:3000/users/${id}`,{
+      method:"DELETE"
+    }).then(res=>res.json()).then(data=>{
+      console.log(data);
+      if(data.deletedCount){
+        const remaingUser=user.filter((data)=> data._id !== id);
+        setUser(remaingUser)
+      }
+    })
+  }
+  return (
+    <div>
      {
-      Fetchdata.map((name)=><div key={name.id}>
-       <h2>{name.name}</h2>
-       <h3>{name.email}</h3>
-      </div>)
+      user.map((data)=>{
+        return <div key={data._id}>
+          <h2> {data.name} </h2>
+          <h2> {data.email} </h2>
+          <div>
+            <button onClick={()=>handleDelate(data._id)} >Delate</button>
+            <Link to={`/users/${data._id}`}> Details page</Link>
+            <Link to={`/update/${data._id}`}>Update User</Link>
+          </div>
+        </div>
+      })
      }
     </div>
   );
 };
 
-export default User;
+//Details page
+const UsersDetails = () => {
+  const data =useLoaderData()
+  console.log(data);
+  
+  return (
+    <div>
+      <h2>User Details Pages</h2>
+      <div>
+       <h2> {data.name} </h2>
+       <h2> {data.email} </h2>
+      </div>
+    </div>
+  );
+};
+
+
+//Update users
+
+const UserUpdate = () => {
+  const dataUpdate=useLoaderData()
+  
+  const handleUpdate=e=>{
+    e.preventDefault()
+    const name=e.target.name.value;
+    const email=e.target.email.value;
+    const newUpdate={name, email}
+    console.log(newUpdate);
+    
+    fetch(`http://localhost:3000/users/${dataUpdate._id}`,{
+      method:"PUT",
+      headers:{
+        "Content-Type": "application/json"
+      },
+      body:JSON.stringify(newUpdate)
+
+    }).then(res=>res.json()).then((data)=>{
+      console.log("Fronted update",data);
+    })
+  }
+  return (
+  <div>
+    <form onSubmit={handleUpdate}>
+        <input type="text" name='name' defaultValue={dataUpdate.name}/>
+        <input type="email" name='email' defaultValue={dataUpdate.email} />
+        <input type="submit" value="Update Users" />
+      </form>
+  </div>
+  );
+};
+
+export default UserUpdate;
+
+
+
 ```
+
+
 
 
 
