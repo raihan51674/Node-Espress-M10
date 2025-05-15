@@ -37,6 +37,9 @@ Swal.fire({
   confirmButtonText: "Yes, delete it!"
 }).then((result) => {
   if (result.isConfirmed) {
+  //1.akhane fetch korbo
+//2.then(data=>.. ar pore baki ta bosabo
+  
     Swal.fire({
       title: "Deleted!",
       text: "Your file has been deleted.",
