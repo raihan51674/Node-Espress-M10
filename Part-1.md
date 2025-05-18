@@ -1,3 +1,15 @@
+### FromData Recive:
+```js
+const handleSubmit = (e) => {
+    e.preventDefault();
+    const form=e.target;
+    const formData = new FormData(form)
+    const CoffeData= Object.fromEntries(formData.entries())
+    console.log(CoffeData);
+    
+  };
+```
+
 ## State manage :
 ```js
 const initialdata = useLoaderData()
