@@ -61,6 +61,7 @@ Swal.fire({
 });
 
 //3. suscefull show
+//import Swal from 'sweetalert2';
 
 Swal.fire({
   position: "top-end",
